@@ -4,222 +4,6 @@ import os
 import webbrowser
 
 #----------------------------------------------------------------------------
-class Boxes_List():   #lista doblemente enlazada
-    def __init__(self) -> None:
-        self.boxes_head : Box = None #cabecera
-        self.boxes_bottom = None #final
-        self.boxes_size = 0
-
-    def add_to_end(self,box,box_posX,box_posY,box_color,font_color):
-        new_boxes = Box(box,box_posX,box_posY,box_color,font_color)
-        self.boxes_size += 1
-        if self.boxes_head is None:
-            self.boxes_head = new_boxes
-            self.boxes_bottom = new_boxes
-        else:
-            self.boxes_bottom.setNext_Box(new_boxes)
-            new_boxes.setPrevius_Box(self.boxes_bottom)
-            self.boxes_bottom = new_boxes
-        return new_boxes
-
-    def get_Boxs(self, box):
-        tmp = self.boxes_head
-        while tmp != None:
-            if tmp.get_Box() == box:
-                return tmp
-            tmp = tmp.getNext_Box()
-    
-    def get_Boxs_By_Pos(self, pos_x, pos_y):
-        tmp = self.boxes_head
-        while tmp != None:
-            if tmp.getPosX_Box() == pos_x and tmp.getPosY_Box() == pos_y:
-                return tmp
-            tmp = tmp.getNext_Box()
-
-    def slide_Derecha(self):
-        tmp =  self.boxes_head
-        while tmp != None:
-            tmp = tmp.getColor_Box()
-
-    def show_Boxes2(self):
-        tmp = self.boxes_head
-        while tmp != None:
-            print('Color:', tmp.get_Box(), 'Pos X: ', tmp.getPosX_Box(), 'Pos Y: ' , tmp.getPosY_Box())
-            tmp = tmp.getNext_Box()
-    
-    def show_Boxes(self, name , code):
-        tmp = self.boxes_head
-
-        strGrafica = 'digraph G { \n graph [pad="1" bgcolor="purple:pink" style="filled" margin="0"  penwidth="3"] \n'
-        strGrafica += 'label = "Nombre Piso: {} Codigo Piso: {}" fontname="Arial Black" fontsize="20pt" \n'.format(name,code)
-        strGrafica += 'node [style = filled shape = box height="1" width="1"] \n'
-        #strGrafica += 'edge [dir="both" arrowsize = "0.3"] \n'
-
-        while tmp != None:
-            strGrafica += '{}[fillcolor= "{}" fontcolor = "{}" pos="{},-{}!"] \n'.format(tmp.get_Box(),tmp.getColor_Box(),tmp.getFont_Box(),tmp.getPosX_Box(),tmp.getPosY_Box())
-            tmp = tmp.getNext_Box()
-
-        tmp = self.boxes_head
-        while tmp != None:
-            if tmp.getNext_Box() is None:
-                None
-            else: 
-                strGrafica += '{}->{};\n'.format(tmp.get_Box(),tmp.getNext_Box().get_Box())
-            tmp = tmp.getNext_Box()
-        
-        strGrafica += ' } '
-        documentotxt = 'textoplano.txt'
-        with open(documentotxt,'w') as grafica: 
-            grafica.write(strGrafica)
-        pdf = 'G{}{}.pdf'.format(name,code)
-        os.system( 'neato -Tpdf ' + documentotxt + ' -o ' + pdf )
-        webbrowser.open(pdf)
-#----------------------------------------------------------------------------
-class Box():
-    def __init__(self, box,box_posX,box_posY,box_color,font_color) -> None:
-        self.box_font: str = font_color
-        self.box_color: str = box_color
-        self.box_posX: int = box_posX
-        self.box_posY: int = box_posY
-        self.box =  box
-        self.next_box = None
-        self.previus = None
-        self.up_box = None
-        self.down_box = None
-
-    def get_Box(self):
-        return self.box
-
-    def set_Box(self, box):
-        self.box = box
-
-    def getPosX_Box(self):
-        return self.box_posX
-
-    def setPosX_Box(self, box_posX):
-        self.box_posX = box_posX
-
-    def getPosY_Box(self):
-        return self.box_posY
-
-    def setPosY_Box(self, box_posY):
-        self.box_posY = box_posY
-
-    def getColor_Box(self):
-        return self.box_color
-
-    def setColor_Box(self, box_color):
-        self.box_color = box_color
-
-    def getFont_Box(self):
-        return self.box_font
-
-    def setFont_Box(self, box_font):
-        self.box_font = box_font
-
-    def getNext_Box(self):
-        return self.next_box
-
-    def setNext_Box(self, next_box):
-        self.next_box = next_box
-    
-    def getPrevius_Box(self):
-        return self.previus
-
-    def setPrevius_Box(self, previus):
-        self.previus = previus
-
-    def getUp_Box(self):
-        return self.up_box
-
-    def setUp_Box(self, up):
-        self.up_box = up
-    
-    def getDown_Box(self):
-        return self.down_box
-
-    def setDown_Box(self, down):
-        self.down_box = down
-#----------------------------------------------------------------------------
-
-#----------------------------------------------------------------------------
-class Linked_list():
-    def __init__(self) -> None:
-        self.head : Node = None #cabecera
-        self.bottom = None #final
-        self.size = 0
-
-    def add_to_end(self, city_name, char, index):
-        new = Node (city_name, char, index)
-        self.size += 1
-        if self.head is None:
-            self.head = new
-            self.bottom = new
-        else:
-            self.bottom.setNext_Char(new)
-            self.bottom = new
-        return new
-
-    def get_size(self):
-        count = 0
-        node = self.head
-        while node != None:
-            node = node.getNext_Char()
-            count = count + 1
-        return count
-
-    def get_chars(self, city_name):
-        tmp = self.head
-        while tmp != None:
-            if tmp.getCity_Name() == city_name:
-                return tmp
-            tmp = tmp.getNext_Char()
-    
-    def get_next_in_list(self, index):
-        tmp = self.head
-        while tmp != None:
-            if tmp.getIndex() == index:
-                return tmp.getChar()
-            tmp = tmp.getNext_Index()
-
-    def show_chars(self):
-        tmp = self.head
-        for i in range(self.size):
-            print(tmp.getChar())
-            tmp = tmp.getNext_Char()
-#----------------------------------------------------------------------------
-class Node():
-    def __init__(self, city_name,char, index) -> None:
-        self.char = char
-        self.index = index
-        self.city_name = city_name
-        self.colors = Boxes_List()
-        self.next = None
-    
-    def getCity_Name(self):
-        return self.name
-
-    def getChar(self):
-        return self.char
-    
-    def getIndex(self):
-        return self.index
-
-    
-    def getNext_Index(self):
-        return self.next
-
-    def setNext_Index(self, index):
-        self.next = index
-
-    def getNext_Char(self):
-        return self.next
-
-    def setNext_Char(self, char):
-        self.next = char
-#----------------------------------------------------------------------------
-
-#----------------------------------------------------------------------------
 class Linked_list_military():
     def __init__(self) -> None:
         self.military_head : Node_military = None #cabecera
@@ -325,7 +109,6 @@ class Node_robot():
         self.robot_name: str = robot_name
         self.robot_type: str = robot_type
         self.robot_capacity: int = robot_capacity
-        #self.code_patterns = Patterns_List()
         self.next_robot = None
 
     def getName_Robot(self):
@@ -342,6 +125,194 @@ class Node_robot():
 
     def setNext_Robot(self, robot):
         self.next_robot = robot
+#----------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------
+class Boxes_List():   #lista doblemente enlazada
+    def __init__(self) -> None:
+        self.boxes_head : Box = None #cabecera
+        self.boxes_bottom = None #final
+        self.boxes_size = 0
+
+    def add_to_end(self,box,box_posX,box_posY,box_color,font_color):
+        new_boxes = Box(box,box_posX,box_posY,box_color,font_color)
+        self.boxes_size += 1
+        if self.boxes_head is None:
+            self.boxes_head = new_boxes
+            self.boxes_bottom = new_boxes
+        else:
+            self.boxes_bottom.setNext_Box(new_boxes)
+            new_boxes.setPrevius_Box(self.boxes_bottom)
+            self.boxes_bottom = new_boxes
+        return new_boxes
+
+    def get_Boxs(self, box):
+        tmp = self.boxes_head
+        while tmp != None:
+            if tmp.get_Box() == box:
+                return tmp
+            tmp = tmp.getNext_Box()
+    
+    def get_Boxs_By_Pos(self, pos_x, pos_y):
+        tmp = self.boxes_head
+        while tmp != None:
+            if tmp.getPosX_Box() == pos_x and tmp.getPosY_Box() == pos_y:
+                return tmp
+            tmp = tmp.getNext_Box()
+
+    def slide_Derecha(self):
+        tmp =  self.boxes_head
+        while tmp != None:
+            tmp = tmp.getColor_Box()
+
+    def show_Boxes2(self):
+        tmp = self.boxes_head
+        while tmp != None:
+            print('Color:', tmp.get_Box(), 'Pos X: ', tmp.getPosX_Box(), 'Pos Y: ' , tmp.getPosY_Box())
+            tmp = tmp.getNext_Box()
+    
+    def show_Boxes(self, name , code):
+        tmp = self.boxes_head
+
+        strGrafica = 'digraph G { \n graph [pad="1" bgcolor="purple:pink" style="filled" margin="0"  penwidth="3"] \n'
+        strGrafica += 'label = "Nombre Piso: {} Codigo Piso: {}" fontname="Arial Black" fontsize="20pt" \n'.format(name,code)
+        strGrafica += 'node [style = filled shape = box height="1" width="1"] \n'
+        #strGrafica += 'edge [dir="both" arrowsize = "0.3"] \n'
+
+        while tmp != None:
+            strGrafica += '{}[fillcolor= "{}" fontcolor = "{}" pos="{},-{}!"] \n'.format(tmp.get_Box(),tmp.getColor_Box(),tmp.getFont_Box(),tmp.getPosX_Box(),tmp.getPosY_Box())
+            tmp = tmp.getNext_Box()
+        
+        strGrafica += ' } '
+        documentotxt = 'textoplano.txt'
+        with open(documentotxt,'w') as grafica: 
+            grafica.write(strGrafica)
+        pdf = 'G{}{}.pdf'.format(name,code)
+        os.system( 'neato -Tpdf ' + documentotxt + ' -o ' + pdf )
+        webbrowser.open(pdf)
+#----------------------------------------------------------------------------
+class Box():
+    def __init__(self, box,box_posX,box_posY,box_color,font_color) -> None:
+        self.box_font: str = font_color
+        self.box_color: str = box_color
+        self.box_posX: int = box_posX
+        self.box_posY: int = box_posY
+        self.box =  box
+        self.next_box = None
+        self.previus = None
+        self.up_box = None
+        self.down_box = None
+
+    def get_Box(self):
+        return self.box
+
+    def set_Box(self, box):
+        self.box = box
+
+    def getPosX_Box(self):
+        return self.box_posX
+
+    def setPosX_Box(self, box_posX):
+        self.box_posX = box_posX
+
+    def getPosY_Box(self):
+        return self.box_posY
+
+    def setPosY_Box(self, box_posY):
+        self.box_posY = box_posY
+
+    def getColor_Box(self):
+        return self.box_color
+
+    def setColor_Box(self, box_color):
+        self.box_color = box_color
+
+    def getFont_Box(self):
+        return self.box_font
+
+    def setFont_Box(self, box_font):
+        self.box_font = box_font
+
+    def getNext_Box(self):
+        return self.next_box
+
+    def setNext_Box(self, next_box):
+        self.next_box = next_box
+    
+    def getPrevius_Box(self):
+        return self.previus
+
+    def setPrevius_Box(self, previus):
+        self.previus = previus
+
+    def getUp_Box(self):
+        return self.up_box
+
+    def setUp_Box(self, up):
+        self.up_box = up
+    
+    def getDown_Box(self):
+        return self.down_box
+
+    def setDown_Box(self, down):
+        self.down_box = down
+#----------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------
+class Patterns_List():
+    def __init__(self) -> None:
+        self.patterns_head : Pattern = None #cabecera
+        self.patterns_bottom = None #final
+        self.patterns_size = 0
+
+    def add_to_end(self, pattern_code, patterns):
+        new_patterns = Pattern(pattern_code, patterns)
+        self.patterns_size += 1
+        if self.patterns_head is None:
+            self.patterns_head = new_patterns
+            self.patterns_bottom = new_patterns
+        else:
+            self.patterns_bottom.setNext_Pattern(new_patterns)
+            self.patterns_bottom = new_patterns
+        return new_patterns
+        
+    def get_Patterns(self, Pattern_Code):
+        tmp = self.patterns_head
+        while tmp != None:
+            if tmp.getCode_Pattern() == Pattern_Code:
+                return tmp
+            tmp = tmp.getNext_Pattern()
+
+    def show_Patterns(self):
+        tmp = self.patterns_head
+        for i in range(self.patterns_size):
+            print('Codigo Patron: ', tmp.getCode_Pattern(), 'Patron: ' , tmp.get_Pattern())
+            tmp = tmp.getNext_Pattern()
+#----------------------------------------------------------------------------
+class Pattern():
+    def __init__(self, pattern_code, pattern) -> None:
+        self.pattern_code: str = pattern_code
+        self.pattern: str = pattern
+        self.color_patterns = Boxes_List()                 
+        self.next_pattern = None
+
+    def getNext_Pattern(self):
+        return self.next_pattern
+
+    def setNext_Pattern(self, next_pattern):
+        self.next_pattern = next_pattern
+
+    def setCode_Pattern(self, pattern_code):
+        self.pattern_code = pattern_code
+
+    def getCode_Pattern(self):
+        return self.pattern_code
+
+    def set_Pattern(self, pattern):
+        self.pattern = pattern
+
+    def get_Pattern(self):
+        return self.pattern
 #----------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------
@@ -389,7 +360,7 @@ class Node_city():
         self.city_rows: int = city_rows
         self.city_column: int = city_column
         self.military_units = Linked_list_military()
-        self.row_list = Linked_list()
+        self.code_patterns = Patterns_List()
         self.next_city = None
 
     def getName_City(self):
@@ -409,12 +380,6 @@ class Node_city():
 #----------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------
-#Globals
-name = ''
-rows = 0
-columns = 0
-pattern_code = ''
-pattern = ''
 
 
 #----------------------------------------------------------------------------
@@ -435,96 +400,73 @@ def MiniDom(ruta, linked_list: Linked_list_city, linked_robots: Linked_list_robo
 
         cityses = linked_list.add_to_end(name,rows,columns)
         #linked_list.show_Citys()
-        count = 0
-        for row_list in rowses:
-            row_list.attributes['numero'].value
-            node = row_list.firstChild.data
+
+        pattern = ''
+        for lista in rowses:
+            lista.attributes['numero'].value
+            node = lista.firstChild.data
             for nodes in node:
-                nodeses = cityses.row_list.add_to_end(name,nodes,count)
-                count += 1
+                pattern += nodes
             
-                pos_x = 0
-                pos_y = 0
-                contador = 1
+        codes = cityses.code_patterns.add_to_end(name,pattern)
+        
+        pos_x = 0
+        pos_y = 0
+        contador = 1 
 
-                Withe = '#FFFFFF'
-                Black = '#000000'
-                Green = '#008000'
-                Red = '#FF0000'
-                Blue = '#0000FF'
-                Gray = '#808080'
-                Font_W = 'white'
-                Font_B = 'black'
-                Font_G = 'green'
-                Font_R = 'red'
-                Font_Bu = 'blue'
-                Font_Gr = 'gray'
-                
-                for i in range(cityses.row_list.get_size()):
-                    color = cityses.row_list.get_next_in_list(i)
-                    count_rows = 0
-                    while int(rows) > count_rows:
-                        count_cols = 0
-                        if color == ' ':
-                            color = 'W{}'.format(str(contador))
-                            nodeses.colors.add_to_end(color,pos_x,pos_y,Withe,Font_W)
-                            contador += 1 
-                            pos_x += 1 
-                        elif color == '*':
-                            color = 'B{}'.format(str(contador))
-                            nodeses.colors.add_to_end(color,pos_x,pos_y,Black,Font_B)
-                            contador = contador +1
-                            pos_x += 1
-                        elif color == 'E':
-                            color = 'E{}'.format(str(contador))
-                            nodeses.colors.add_to_end(color,pos_x,pos_y,Green,Font_G)
-                            contador = contador +1
-                            pos_x += 1
-                        elif color == 'C':
-                            color = 'C{}'.format(str(contador))
-                            nodeses.colors.add_to_end(color,pos_x,pos_y,Blue,Font_Bu)
-                            contador = contador +1
-                            pos_x += 1
-                        elif color == 'R':
-                            color = 'R{}'.format(str(contador))
-                            nodeses.colors.add_to_end(color,pos_x,pos_y,Gray,Font_Gr)
-                            contador = contador +1
-                            pos_x += 1
-                        while int(columns) > count_cols:
-                            count_cols += 1
-                        if color == ' ':
-                            color = 'W{}'.format(str(contador))
-                            nodeses.colors.add_to_end(color,pos_x,pos_y,Withe,Font_W)
-                            contador += 1 
-                            pos_x += 1 
-                        elif color == '*':
-                            color = 'B{}'.format(str(contador))
-                            nodeses.colors.add_to_end(color,pos_x,pos_y,Black,Font_B)
-                            contador = contador +1
-                            pos_x += 1
-                        elif color == 'E':
-                            color = 'E{}'.format(str(contador))
-                            nodeses.colors.add_to_end(color,pos_x,pos_y,Green,Font_G)
-                            contador = contador +1
-                            pos_x += 1
-                        elif color == 'C':
-                            color = 'C{}'.format(str(contador))
-                            nodeses.colors.add_to_end(color,pos_x,pos_y,Blue,Font_Bu)
-                            contador = contador +1
-                            pos_x += 1
-                        elif color == 'R':
-                            color = 'R{}'.format(str(contador))
-                            nodeses.colors.add_to_end(color,pos_x,pos_y,Gray,Font_Gr)
-                            contador = contador +1
-                            pos_x += 1
-                        count_rows = count_rows + 1
-                        if pos_x >= int(columns):
-                            pos_y += 1
-                            pos_x = 0
-                #print(color)
+        Withe = '#FFFFFF'
+        Black = '#000000'
+        Green = '#008000'
+        Blue = '#0000FF'
+        Gray = '#808080'
+        Font_W = 'white'
+        Font_B = 'black'
+        Font_G = 'green'
+        Font_Bu = 'blue'
+        Font_Gr = 'gray'
+        
+        for color in pattern:
+            count_rows = 0
+            while int(rows) > count_rows:
+                count_cols = 0
+                if color == ' ':
+                    color = 'W{}'.format(str(contador))
+                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Withe,Font_W)
+                    contador += 1 
+                    pos_x += 1 
+                elif color == '*':
+                    color = 'B{}'.format(str(contador))
+                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Black,Font_B)
+                    contador += 1
+                    pos_x += 1
+                elif color == 'E':
+                    color = 'E{}'.format(str(contador))
+                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Green,Font_G)
+                    contador += 1
+                    pos_x += 1
+                elif color == 'C':
+                    color = 'C{}'.format(str(contador))
+                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Blue,Font_Bu)
+                    contador += 1
+                    pos_x += 1
+                elif color == 'R':
+                    color = 'R{}'.format(str(contador))
+                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Gray,Font_Gr)
+                    contador += 1
+                    pos_x += 1
+                while int(columns) > count_cols:
+                    count_cols += 1
+                count_rows += 1
+                if pos_x >= int(columns):
+                    pos_y += 1
+                    pos_x = 0
+
+        
+        #print(pattern)
         #cityses.row_list.show_chars()
-        #nodeses.colors.show_Boxes('nombre','codigo')
-
+        #codes.color_patterns.show_Boxes('nombre','codigo')
+        #codes.color_patterns.show_Boxes2()
+              
         for military in military_unit:
             combat_capacity = military.firstChild.data
             military_pos_x = military.attributes['fila'].value
@@ -549,7 +491,56 @@ def MiniDom(ruta, linked_list: Linked_list_city, linked_robots: Linked_list_robo
 
 #---------------------------------------------------------------------------- 
 
+def second_menu(linked_list,linked_robots: Linked_list_robot):
+    flag = True
+    while flag:
+        print('=======================')
+        print('Menu Secundario')
+        print('=======================')
+        print('1. Buscar ciudad por nombre')
+        print('2. Mostrar Ciudad')
+        print('3. Seleccionar un Patron')
+        print('4. Imprimir el Patron')
+        print('5. Seleccionar patron de cambio')
+        print('6. Volver al menu Principal')
+        print('=======================')
 
+        option = input('> ')
+        
+        name1 = ''
+        codigo = ''
+
+        if option == '1':
+            try:
+                name1 =  input('Ingrese el nombre de la ciudad que desea seleccionar: ')
+                citys1: Node_city = linked_list.get_Citys(name1)
+                if citys1 is None:
+                    print('Nombre incorrecto')
+                else:
+                    print(' > Se ha seleccionado la ciudad: ', citys1.getName_City())
+            except:
+                print('Asegurese de haber cargado la data')
+        elif option == '2':
+            try:
+                codes1 = citys1.code_patterns.get_Patterns(citys1.getName_City())
+                codes1.color_patterns.show_Boxes(citys1.getName_City(),'asdf')
+                #codes1.color_patterns.show_Boxes2()
+            except:
+                print('Asegurese de haber seleccionado una ciudad')
+        elif option == '3':
+            pass
+        elif option == '4':
+            pass 
+        elif option == '5':
+
+            #third_menu(linked,citys1,codes1,colorses1)
+            break
+            
+        elif option == '6':
+            main_menu(linked_list,linked_robots)
+            break
+        else:
+            print('Opcion Invalida!')
 
 
 
@@ -569,7 +560,7 @@ def main_menu(linked_list: Linked_list_city,linked_robots: Linked_list_robot):
         option = input('> ')
 
         if option == '1':
-            MiniDom('./Files/ArchivoPrueba.xml', linked_list,linked_robots)
+            MiniDom('./Files/ArchivoPruebas.xml', linked_list,linked_robots)
             print(' > La data se ha cargado!')
         elif option == '2':
             print(' > Ciudades Cargadas: ')
