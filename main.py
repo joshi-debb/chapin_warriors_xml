@@ -1,3 +1,4 @@
+from asyncio.proactor_events import _ProactorDuplexPipeTransport
 from xml.dom import minidom
 
 import os 
@@ -21,10 +22,10 @@ class Linked_list_military():
             self.military_bottom = new_military
         return new_military
 
-    def get_Militarys(self, capacity):
+    def get_Militarys(self, pos_X, pos_y):
         tmp = self.military_head
         while tmp != None:
-            if tmp.getCapacity_Military() == capacity:
+            if tmp.getPos_X() == pos_X and tmp.getPos_Y == pos_y:
                 return tmp
             tmp = tmp.getNext_Military()
 
@@ -83,7 +84,14 @@ class Linked_list_robot():
             self.robot_bottom = new_robot
         return new_robot
 
-    def get_Decks(self, robot_name):
+    def get_Robots_by_type(self, robot_type):
+        tmp = self.robot_head
+        while tmp != None:
+            if tmp.getType_Robot() == robot_type:
+                return tmp
+            tmp = tmp.getNext_Robot()
+    
+    def get_Robots_by_name(self, robot_name):
         tmp = self.robot_head
         while tmp != None:
             if tmp.getName_Robot() == robot_name:
@@ -103,6 +111,14 @@ class Linked_list_robot():
         for i in range(self.robot_size):
             print('Nombre:', tmp.getName_Robot(), 'Tipo:', tmp.getType_Robot(), 'Capacidad: ', tmp.getCapacity_Robot())
             tmp = tmp.getNext_Robot()
+    
+    def show_Robots_by_type(self, robot_type):
+        tmp = self.robot_head
+        while tmp != None:
+            if tmp.getType_Robot() == robot_type:
+                print('Nombre:', tmp.getName_Robot(), 'Capacidad: ', tmp.getCapacity_Robot())
+            tmp = tmp.getNext_Robot()
+
 #----------------------------------------------------------------------------
 class Node_robot():
     def __init__(self, robot_name, robot_type, robot_capacity) -> None:
@@ -146,10 +162,35 @@ class Boxes_List():   #lista doblemente enlazada
             self.boxes_bottom = new_boxes
         return new_boxes
 
+    def insert_in_pos(self,box_posX,box_posY,box_color,font_color):
+        tmp = self.boxes_head
+        while tmp != None:
+            if tmp.getPosX_Box() == box_posX and tmp.getPosY_Box() == box_posY:
+                tmp.setColor_Box(box_color)
+                tmp.setFont_Box(font_color)
+            tmp = tmp.getNext_Box()
+
+    def get_size(self):
+        count = 0
+        node = self.boxes_head
+        while node != None:
+            node = node.getNext_Box()
+            count = count + 1
+        return count
+
+
+
     def get_Boxs(self, box):
         tmp = self.boxes_head
         while tmp != None:
             if tmp.get_Box() == box:
+                return tmp
+            tmp = tmp.getNext_Box()
+    
+    def get_Boxs_by_Color(self, color):
+        tmp = self.boxes_head
+        while tmp != None:
+            if tmp.getColor_Box() == color:
                 return tmp
             tmp = tmp.getNext_Box()
     
@@ -165,19 +206,24 @@ class Boxes_List():   #lista doblemente enlazada
         while tmp != None:
             tmp = tmp.getColor_Box()
 
-    def show_Boxes2(self):
+    def show_Boxes(self):
         tmp = self.boxes_head
         while tmp != None:
             print('Color:', tmp.get_Box(), 'Pos X: ', tmp.getPosX_Box(), 'Pos Y: ' , tmp.getPosY_Box())
             tmp = tmp.getNext_Box()
     
-    def show_Boxes(self, name , code):
+    def show_Boxes1(self, name):
         tmp = self.boxes_head
 
-        strGrafica = 'digraph G { \n graph [pad="1" bgcolor="purple:pink" style="filled" margin="0"  penwidth="3"] \n'
-        strGrafica += 'label = "Nombre Piso: {} Codigo Piso: {}" fontname="Arial Black" fontsize="20pt" \n'.format(name,code)
+        #bgcolor="red:purple"
+        #bgcolor="purple:pink"
+        #bgcolor="red:violet"
+        #fillcolor="blue:cyan"
+        #fillcolor="red:yellow"
+
+        strGrafica = 'digraph G { \n graph [pad="1" bgcolor="orange:yellow" style="filled" margin="0"  penwidth="3"] \n'
+        strGrafica += 'label = "Ciudad: {}" fontname="Arial Black" fontsize="20pt" \n'.format(name)
         strGrafica += 'node [style = filled shape = box height="1" width="1"] \n'
-        #strGrafica += 'edge [dir="both" arrowsize = "0.3"] \n'
 
         while tmp != None:
             strGrafica += '{}[fillcolor= "{}" fontcolor = "{}" pos="{},-{}!"] \n'.format(tmp.get_Box(),tmp.getColor_Box(),tmp.getFont_Box(),tmp.getPosX_Box(),tmp.getPosY_Box())
@@ -187,7 +233,53 @@ class Boxes_List():   #lista doblemente enlazada
         documentotxt = 'textoplano.txt'
         with open(documentotxt,'w') as grafica: 
             grafica.write(strGrafica)
-        pdf = 'G{}{}.pdf'.format(name,code)
+        pdf = '{}.pdf'.format(name)
+        os.system( 'neato -Tpdf ' + documentotxt + ' -o ' + pdf )
+        webbrowser.open(pdf)
+    
+    def show_Boxes2(self, nombre_ciudad, coordenadas_rescate, nombre_robot, resultado):
+        tmp = self.boxes_head
+
+        strGrafica = 'digraph G { \n graph [pad="1" bgcolor="blue:cyan" style="filled" margin="0"  penwidth="3"] \n'
+        strGrafica += 'label = "Ciudad: {}" fontname="Arial Black" fontsize="20pt" \n'.format(nombre_ciudad)
+        strGrafica += 'label = "Tipo de mision: Rescate" fontname="Arial Black" fontsize="20pt" \n'
+        strGrafica += 'label = "Unidad Civil Rescatada: {}" fontname="Arial Black" fontsize="20pt" \n'.format(coordenadas_rescate)
+        strGrafica += 'label = "Robot Utilizado: {}" fontname="Arial Black" fontsize="20pt" \n'.format(nombre_robot)
+        strGrafica += 'label = "Resultado de la mision: {}" fontname="Arial Black" fontsize="20pt" \n'.format(resultado)
+        strGrafica += 'node [style = filled shape = box height="1" width="1"] \n'
+
+        while tmp != None:
+            strGrafica += '{}[fillcolor= "{}" fontcolor = "{}" pos="{},-{}!"] \n'.format(tmp.get_Box(),tmp.getColor_Box(),tmp.getFont_Box(),tmp.getPosX_Box(),tmp.getPosY_Box())
+            tmp = tmp.getNext_Box()
+        
+        strGrafica += ' } '
+        documentotxt = 'textoplano.txt'
+        with open(documentotxt,'w') as grafica: 
+            grafica.write(strGrafica)
+        pdf = '{}_{}.pdf'.format(nombre_ciudad,'Rescate')
+        os.system( 'neato -Tpdf ' + documentotxt + ' -o ' + pdf )
+        webbrowser.open(pdf)
+    
+    def show_Boxes3(self, nombre_ciudad, coordenadas_recurso, nombre_robot, capacidad_inicial, capacidad_final, resultado):
+        tmp = self.boxes_head
+
+        strGrafica = 'digraph G { \n graph [pad="1" bgcolor="red:violet" style="filled" margin="0"  penwidth="3"] \n'
+        strGrafica += 'label = "Ciudad: {}" fontname="Arial Black" fontsize="20pt" \n'.format(nombre_ciudad)
+        strGrafica += 'label = "Tipo de mision: Extraccion de Recursos" fontname="Arial Black" fontsize="20pt" \n'
+        strGrafica += 'label = "Recurso Extraido: {}" fontname="Arial Black" fontsize="20pt" \n'.format(coordenadas_recurso)
+        strGrafica += 'label = "Robot Utilizado: {} (Capacidad de combate inicial: {}, Capacidad de combate final: {})" fontname="Arial Black" fontsize="20pt" \n'.format(nombre_robot,capacidad_inicial,capacidad_final)
+        strGrafica += 'label = "Resultado de la mision: {}" fontname="Arial Black" fontsize="20pt" \n'.format(resultado)
+        strGrafica += 'node [style = filled shape = box height="1" width="1"] \n'
+
+        while tmp != None:
+            strGrafica += '{}[fillcolor= "{}" fontcolor = "{}" pos="{},-{}!"] \n'.format(tmp.get_Box(),tmp.getColor_Box(),tmp.getFont_Box(),tmp.getPosX_Box(),tmp.getPosY_Box())
+            tmp = tmp.getNext_Box()
+        
+        strGrafica += ' } '
+        documentotxt = 'textoplano.txt'
+        with open(documentotxt,'w') as grafica: 
+            grafica.write(strGrafica)
+        pdf = '{}_{}.pdf'.format(nombre_ciudad,'Rescate')
         os.system( 'neato -Tpdf ' + documentotxt + ' -o ' + pdf )
         webbrowser.open(pdf)
 #----------------------------------------------------------------------------
@@ -354,6 +446,8 @@ class Linked_list_city():
             print('Nombre:', tmp.getName_City(), 'Filas:', tmp.getRow_City(), 'Columnas: ', tmp.getColumn_City())
             tmp = tmp.getNext_City()
 #----------------------------------------------------------------------------
+
+
 class Node_city():
     def __init__(self, city_name, city_rows, city_column) -> None:
         self.city_name: str = city_name
@@ -381,7 +475,6 @@ class Node_city():
 
 #----------------------------------------------------------------------------
 
-
 #----------------------------------------------------------------------------
 def MiniDom(ruta, linked_list: Linked_list_city, linked_robots: Linked_list_robot):
     mydoc = minidom.parse(ruta)
@@ -407,7 +500,7 @@ def MiniDom(ruta, linked_list: Linked_list_city, linked_robots: Linked_list_robo
             node = lista.firstChild.data
             for nodes in node:
                 pattern += nodes
-            
+        
         codes = cityses.code_patterns.add_to_end(name,pattern)
         
         pos_x = 0
@@ -419,39 +512,35 @@ def MiniDom(ruta, linked_list: Linked_list_city, linked_robots: Linked_list_robo
         Green = '#008000'
         Blue = '#0000FF'
         Gray = '#808080'
-        Font_W = 'white'
-        Font_B = 'black'
-        Font_G = 'green'
-        Font_Bu = 'blue'
-        Font_Gr = 'gray'
-        
+        Red = '#FF0000'
+
         for color in pattern:
             count_rows = 0
             while int(rows) > count_rows:
                 count_cols = 0
                 if color == ' ':
                     color = 'W{}'.format(str(contador))
-                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Withe,Font_W)
+                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Withe,Withe)
                     contador += 1 
                     pos_x += 1 
                 elif color == '*':
                     color = 'B{}'.format(str(contador))
-                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Black,Font_B)
+                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Black,Black)
                     contador += 1
                     pos_x += 1
                 elif color == 'E':
                     color = 'E{}'.format(str(contador))
-                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Green,Font_G)
+                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Green,Green)
                     contador += 1
                     pos_x += 1
                 elif color == 'C':
                     color = 'C{}'.format(str(contador))
-                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Blue,Font_Bu)
+                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Blue,Blue)
                     contador += 1
                     pos_x += 1
                 elif color == 'R':
                     color = 'R{}'.format(str(contador))
-                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Gray,Font_Gr)
+                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Gray,Gray)
                     contador += 1
                     pos_x += 1
                 while int(columns) > count_cols:
@@ -461,18 +550,19 @@ def MiniDom(ruta, linked_list: Linked_list_city, linked_robots: Linked_list_robo
                     pos_y += 1
                     pos_x = 0
 
-        
-        #print(pattern)
-        #cityses.row_list.show_chars()
-        #codes.color_patterns.show_Boxes('nombre','codigo')
-        #codes.color_patterns.show_Boxes2()
-              
+
         for military in military_unit:
             combat_capacity = military.firstChild.data
-            military_pos_x = military.attributes['fila'].value
-            military_pos_y = military.attributes['columna'].value
+            military_pos_x = int(military.attributes['columna'].value)-1 
+            military_pos_y = int(military.attributes['fila'].value)-1
             cityses.military_units.add_to_end(military_pos_x,military_pos_y,combat_capacity)
-            #cityses.military_units.show_Militarys()
+            codes.color_patterns.insert_in_pos(military_pos_x,military_pos_y,Red,Red)
+
+        #cityses.military_units.show_Militarys()
+        #print(pattern)
+        #cityses.row_list.show_chars()
+        #codes.color_patterns.show_Boxes1('nombre','codigo')
+        #codes.color_patterns.show_Boxes()
     
     #Extraer Robots
     robots = mydoc.getElementsByTagName('robot')
@@ -499,48 +589,85 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
         print('=======================')
         print('1. Buscar ciudad por nombre')
         print('2. Mostrar Ciudad')
-        print('3. Seleccionar un Patron')
-        print('4. Imprimir el Patron')
-        print('5. Seleccionar patron de cambio')
-        print('6. Volver al menu Principal')
+        print('3. Elegir tipo de mision')#mostrar robots disponibles,seleccionarlos
+        print('4. Elegir punto de partida y objetivo')
+        print('5. Iniciar mision')#devolver al menu principal
         print('=======================')
 
         option = input('> ')
         
-        name1 = ''
-        codigo = ''
+        city_name = ''
+        mision_type = ''
+        selection_robot = ''
+        mision_result = ''
 
         if option == '1':
             try:
-                name1 =  input('Ingrese el nombre de la ciudad que desea seleccionar: ')
-                citys1: Node_city = linked_list.get_Citys(name1)
-                if citys1 is None:
-                    print('Nombre incorrecto')
+                city_name =  input(' > Ingrese el nombre de la ciudad que desea seleccionar: ')
+                citys: Node_city = linked_list.get_Citys(city_name)
+                
+                if citys is None:
+                    print(' > Nombre incorrecto')
                 else:
-                    print(' > Se ha seleccionado la ciudad: ', citys1.getName_City())
+                    print(' > Se ha seleccionado la ciudad: ', citys.getName_City())
             except:
-                print('Asegurese de haber cargado la data')
+                print(' > Asegurese de haber cargado la data')
         elif option == '2':
             try:
-                codes1 = citys1.code_patterns.get_Patterns(citys1.getName_City())
-                codes1.color_patterns.show_Boxes(citys1.getName_City(),'asdf')
-                #codes1.color_patterns.show_Boxes2()
+                codes = citys.code_patterns.get_Patterns(citys.getName_City())
+                codes.color_patterns.show_Boxes1(citys.getName_City())
+                #codes1.color_patterns.show_Boxes()
             except:
-                print('Asegurese de haber seleccionado una ciudad')
+                print(' > Asegurese de haber seleccionado una ciudad')
         elif option == '3':
-            pass
+
+            print('1. Mision de Rescate')
+            print('2. Mision de Extraccion')
+            mision_type =  input('> ')
+
+            if mision_type == '1':
+                print(' > Robots disponibles para esta mision:')
+                linked_robots.show_Robots_by_type('ChapinRescue')                
+            elif mision_type == '2':
+                print(' > Robots disponibles para esta mision:')
+                linked_robots.show_Robots_by_type('ChapinFighter')    
+            else:
+                print(' > Opcion Invalida!')
+            
+            selection_robot =  input(' > Ingrese el nombre del Robot que desea seleccionar: ')
+            robot = linked_robots.get_Robots_by_name(selection_robot)
+
+            if selection_robot is None:
+                print(' > Nombre incorrecto')
+            else:
+                print(' > Se ha seleccionado el robot: ', robot.getName_Robot())
+
         elif option == '4':
-            pass 
+            Withe = '#FFFFFF'
+            Black = '#000000'
+            Green = '#008000'
+            Blue = '#0000FF'
+            Gray = '#808080'
+            Red = '#FF0000'
+
+            color: Box = codes.color_patterns.boxes_head
+
+            while color != None:
+                if color.getColor_Box() == Green:
+                    print(' > Puntos de Entrada: ')
+                    print('Coordenada X: ',color.getPosX_Box(),'Coordenada Y: ',color.getPosY_Box())
+                elif color.getColor_Box() == Blue:
+                    print(' > Coordenadas de civiles: ')
+                    print('Coordenada X: ',color.getPosX_Box(),'Coordenada Y: ',color.getPosY_Box())
+
         elif option == '5':
 
-            #third_menu(linked,citys1,codes1,colorses1)
-            break
-            
-        elif option == '6':
+            #Devolver al menu principal imediatamente despues de realizar la mision
             main_menu(linked_list,linked_robots)
             break
         else:
             print('Opcion Invalida!')
+
 
 
 
