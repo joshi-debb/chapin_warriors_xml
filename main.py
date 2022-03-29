@@ -1,4 +1,5 @@
-from asyncio.proactor_events import _ProactorDuplexPipeTransport
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
 from xml.dom import minidom
 
 import os 
@@ -116,9 +117,8 @@ class Linked_list_robot():
         tmp = self.robot_head
         while tmp != None:
             if tmp.getType_Robot() == robot_type:
-                print('Nombre:', tmp.getName_Robot(), 'Capacidad: ', tmp.getCapacity_Robot())
+                print(' > Nombre:', tmp.getName_Robot(), 'Capacidad: ', tmp.getCapacity_Robot())
             tmp = tmp.getNext_Robot()
-
 #----------------------------------------------------------------------------
 class Node_robot():
     def __init__(self, robot_name, robot_type, robot_capacity) -> None:
@@ -145,13 +145,13 @@ class Node_robot():
 
 #----------------------------------------------------------------------------
 class Boxes_List():   #lista doblemente enlazada
-    def __init__(self) -> None:
+    def __init__(self):
         self.boxes_head : Box = None #cabecera
         self.boxes_bottom = None #final
         self.boxes_size = 0
 
-    def add_to_end(self,box,box_posX,box_posY,box_color,font_color):
-        new_boxes = Box(box,box_posX,box_posY,box_color,font_color)
+    def add_to_end(self,box,box_posX,box_posY,box_color,font_color,contador):
+        new_boxes = Box(box,box_posX,box_posY,box_color,font_color,contador)
         self.boxes_size += 1
         if self.boxes_head is None:
             self.boxes_head = new_boxes
@@ -177,20 +177,18 @@ class Boxes_List():   #lista doblemente enlazada
             node = node.getNext_Box()
             count = count + 1
         return count
-
-
-
+    
     def get_Boxs(self, box):
         tmp = self.boxes_head
         while tmp != None:
-            if tmp.get_Box() == box:
+            if tmp.getColor_Box() == box:
                 return tmp
             tmp = tmp.getNext_Box()
     
-    def get_Boxs_by_Color(self, color):
+    def get_Boxs_by_index(self, index):
         tmp = self.boxes_head
         while tmp != None:
-            if tmp.getColor_Box() == color:
+            if tmp.get_Index() == int(index):
                 return tmp
             tmp = tmp.getNext_Box()
     
@@ -200,16 +198,51 @@ class Boxes_List():   #lista doblemente enlazada
             if tmp.getPosX_Box() == pos_x and tmp.getPosY_Box() == pos_y:
                 return tmp
             tmp = tmp.getNext_Box()
-
-    def slide_Derecha(self):
-        tmp =  self.boxes_head
+        
+    def get_up_box(self, pos_x, pos_y):
+        tmp = self.boxes_head
         while tmp != None:
-            tmp = tmp.getColor_Box()
+            if tmp.getPosX_Box() == pos_x and tmp.getPosY_Box() == pos_y:
+                temporal = tmp
+                temporal.setPosX_Box(pos_x)
+                temporal.setPosY_Box(pos_y+1)
+                return temporal
+            tmp = tmp.getNext_Box()
+    
+    def get_bot_box(self, pos_x, pos_y):
+        tmp = self.boxes_head
+        while tmp != None:
+            if tmp.getPosX_Box() == pos_x and tmp.getPosY_Box() == pos_y:
+                temporal = tmp
+                temporal.setPosX_Box(pos_x)
+                temporal.setPosY_Box(pos_y-1)
+                return temporal
+            tmp = tmp.getNext_Box()
+    
+    def get_rigth_box(self, pos_x, pos_y):
+        tmp = self.boxes_head
+        while tmp != None:
+            if tmp.getPosX_Box() == pos_x and tmp.getPosY_Box() == pos_y:
+                temporal = tmp
+                temporal.setPosX_Box(pos_x+1)
+                temporal.setPosY_Box(pos_y)
+                return temporal
+            tmp = tmp.getNext_Box()
+    
+    def get_left_box(self, pos_x, pos_y):
+        tmp = self.boxes_head
+        while tmp != None:
+            if tmp.getPosX_Box() == pos_x and tmp.getPosY_Box() == pos_y:
+                temporal = tmp
+                temporal.setPosX_Box(pos_x-1)
+                temporal.setPosY_Box(pos_y)
+                return temporal
+            tmp = tmp.getNext_Box()
 
     def show_Boxes(self):
         tmp = self.boxes_head
         while tmp != None:
-            print('Color:', tmp.get_Box(), 'Pos X: ', tmp.getPosX_Box(), 'Pos Y: ' , tmp.getPosY_Box())
+            print('Color:', tmp.get_Box(), 'Pos X: ', tmp.getPosX_Box(), 'Pos Y: ' , tmp.getPosY_Box() ,'Index: ' , tmp.get_Index())
             tmp = tmp.getNext_Box()
     
     def show_Boxes1(self, name):
@@ -284,16 +317,33 @@ class Boxes_List():   #lista doblemente enlazada
         webbrowser.open(pdf)
 #----------------------------------------------------------------------------
 class Box():
-    def __init__(self, box,box_posX,box_posY,box_color,font_color) -> None:
+    def __init__(self, box,box_posX,box_posY,box_color,font_color,index):
         self.box_font: str = font_color
         self.box_color: str = box_color
-        self.box_posX: int = box_posX
-        self.box_posY: int = box_posY
+        self.box_posX: int = int(box_posX)
+        self.box_posY: int = int(box_posY)
+        self.box_index: int = int(index)
         self.box =  box
+
         self.next_box = None
         self.previus = None
         self.up_box = None
         self.down_box = None
+                
+        self.blocked = False
+
+
+    def getNext_Box(self):
+        return self.next_box
+
+    def setNext_Box(self, next_box):
+        self.next_box = next_box
+
+    def get_Index(self):
+        return self.box_index
+
+    def set_Index(self, index):
+        self.box_index = index    
 
     def get_Box(self):
         return self.box
@@ -324,12 +374,6 @@ class Box():
 
     def setFont_Box(self, box_font):
         self.box_font = box_font
-
-    def getNext_Box(self):
-        return self.next_box
-
-    def setNext_Box(self, next_box):
-        self.next_box = next_box
     
     def getPrevius_Box(self):
         return self.previus
@@ -440,14 +484,17 @@ class Linked_list_city():
             count = count + 1
         return count
 
+    def clear(self):
+        self.city_head = None
+        self.city_bottom = None
+        self.city_size = 0
+
     def show_Citys(self):
         tmp = self.city_head
         for i in range(self.city_size):
-            print('Nombre:', tmp.getName_City(), 'Filas:', tmp.getRow_City(), 'Columnas: ', tmp.getColumn_City())
+            print(' > Nombre:', tmp.getName_City(), 'Filas:', tmp.getRow_City(), 'Columnas: ', tmp.getColumn_City())
             tmp = tmp.getNext_City()
 #----------------------------------------------------------------------------
-
-
 class Node_city():
     def __init__(self, city_name, city_rows, city_column) -> None:
         self.city_name: str = city_name
@@ -474,10 +521,11 @@ class Node_city():
 #----------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------
+def MiniDom(datas, linked_list: Linked_list_city, linked_robots: Linked_list_robot):
 
-#----------------------------------------------------------------------------
-def MiniDom(ruta, linked_list: Linked_list_city, linked_robots: Linked_list_robot):
-    mydoc = minidom.parse(ruta)
+    linked_list.clear()
+
+    mydoc = minidom.parse(datas)
 
     #Extraer Ciudades
     citys = mydoc.getElementsByTagName('ciudad')
@@ -520,27 +568,27 @@ def MiniDom(ruta, linked_list: Linked_list_city, linked_robots: Linked_list_robo
                 count_cols = 0
                 if color == ' ':
                     color = 'W{}'.format(str(contador))
-                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Withe,Withe)
+                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Withe,Withe,contador)
                     contador += 1 
                     pos_x += 1 
                 elif color == '*':
                     color = 'B{}'.format(str(contador))
-                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Black,Black)
+                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Black,Black,contador)
                     contador += 1
                     pos_x += 1
                 elif color == 'E':
                     color = 'E{}'.format(str(contador))
-                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Green,Green)
+                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Green,Green,contador)
                     contador += 1
                     pos_x += 1
                 elif color == 'C':
                     color = 'C{}'.format(str(contador))
-                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Blue,Blue)
+                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Blue,Blue,contador)
                     contador += 1
                     pos_x += 1
                 elif color == 'R':
                     color = 'R{}'.format(str(contador))
-                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Gray,Gray)
+                    codes.color_patterns.add_to_end(color,pos_x,pos_y,Gray,Gray,contador)
                     contador += 1
                     pos_x += 1
                 while int(columns) > count_cols:
@@ -575,33 +623,49 @@ def MiniDom(ruta, linked_list: Linked_list_city, linked_robots: Linked_list_robo
                 capacity = attribs.attributes['capacidad'].value
             elif type_robot == 'ChapinRescue':
                 capacity = None
-            linked_robots.add_to_end(robots_names,type_robot,capacity)
-            
+            linked_robots.add_to_end(robots_names,type_robot,capacity)     
     #linked_robots.show_Robots()
-
 #---------------------------------------------------------------------------- 
 
+#GLOBALS
+city_name = ''
+type_of_mision = ''
+selection_robot = ''
+mision_result = ''
+
 def second_menu(linked_list,linked_robots: Linked_list_robot):
+
     flag = True
     while flag:
+        print('\n')
         print('=======================')
         print('Menu Secundario')
         print('=======================')
         print('1. Buscar ciudad por nombre')
         print('2. Mostrar Ciudad')
-        print('3. Elegir tipo de mision')#mostrar robots disponibles,seleccionarlos
-        print('4. Elegir punto de partida y objetivo')
-        print('5. Iniciar mision')#devolver al menu principal
+        print('3. Configurar Misiones')
+        print('4. Inciar Misiones')
         print('=======================')
-
+        print('\n')
         option = input('> ')
         
-        city_name = ''
+        global city_name
+        global type_of_mision
+        global selection_robot
+        global mision_result
+        
+        Withe = '#FFFFFF'
+        Black = '#000000'
+        Green = '#008000'
+        Blue = '#0000FF'
+        Gray = '#808080'
+        Red = '#FF0000'
+        path = '#FFF176' 
+    
         mision_type = ''
-        selection_robot = ''
-        mision_result = ''
 
         if option == '1':
+            print('\n')
             try:
                 city_name =  input(' > Ingrese el nombre de la ciudad que desea seleccionar: ')
                 citys: Node_city = linked_list.get_Citys(city_name)
@@ -620,61 +684,171 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
             except:
                 print(' > Asegurese de haber seleccionado una ciudad')
         elif option == '3':
-
-            print('1. Mision de Rescate')
-            print('2. Mision de Extraccion')
+            print('\n')
+            print(' > 1. Mision de Rescate')
+            print(' > 2. Mision de Extraccion')
+            print('\n')
             mision_type =  input('> ')
 
             if mision_type == '1':
-                print(' > Robots disponibles para esta mision:')
-                linked_robots.show_Robots_by_type('ChapinRescue')                
+                
+                type_of_mision = 'Mision de Rescate'
+
+                color =  codes.color_patterns.boxes_head
+                color1 =  codes.color_patterns.boxes_head 
+
+                #Mision de Rescate
+                print('\n')
+                print('> Robots disponibles para esta mision:')
+                linked_robots.show_Robots_by_type('ChapinRescue')
+                #Seleccionar Robot
+                print('\n')
+                selection_robot =  input('> Ingrese el nombre del Robot que desea seleccionar: ')
+                robot = linked_robots.get_Robots_by_name(selection_robot)
+                if selection_robot is None:
+                    print(' > Nombre incorrecto')
+                else:
+                    print(' > Se ha seleccionado el robot: ', robot.getName_Robot())
+
+                #Mostrar Ubicacion de Puntos de entrada y civiles
+                print('\n')
+                print('> Puntos de Entrada: ')
+                while color != None:
+                    if color.getColor_Box() == Green:
+                        print(' > Punto de Entrada: (X:{},Y:{})'.format(color.getPosX_Box(),color.getPosY_Box()))
+                    color = color.getNext_Box()
+                print('\n')
+                print('> Ubicacion de Civiles: ')
+                while color1 != None:
+                    if color1.getColor_Box() == Blue:
+                        print(' > Ubicacion de Civil: (X:{},Y:{})'.format(color1.getPosX_Box(),color1.getPosY_Box()))
+                    color1 = color1.getNext_Box()
+                print('\n')
+                entrada_x =  input('> Ingrese coordenada X del punto de Entrada: ')
+                entrada_y =  input('> Ingrese coordenada Y del punto de Entrada: ')
+
+                Entrada = codes.color_patterns.get_Boxs_By_Pos(int(entrada_x),int(entrada_y))
+
+                if Entrada.getColor_Box() != Green:
+                    print(' > Coordenadas De Entrada Incorrectas') 
+                print('\n')
+
+                civil_x =  input('> Ingrese coordenada X del punto del Civil: ')
+                civil_y =  input('> Ingrese coordenada Y del punto del Civil: ')
+
+                Civil = codes.color_patterns.get_Boxs_By_Pos(int(civil_x),int(civil_y))
+
+                if Civil.getColor_Box() != Blue:
+                    print(' > Coordenadas De Civil Incorrectas')
+                print('\n')
+
             elif mision_type == '2':
-                print(' > Robots disponibles para esta mision:')
-                linked_robots.show_Robots_by_type('ChapinFighter')    
+
+                type_of_mision = 'Mision de Extraccion'
+
+                color =  codes.color_patterns.boxes_head
+                color1 =  codes.color_patterns.boxes_head   
+
+                #Mision de Extraccion
+                print('\n')
+                print('> Robots disponibles para esta mision:')
+                linked_robots.show_Robots_by_type('ChapinFighter')
+                
+                #Seleccionar Robot
+                print('\n')
+                selection_robot =  input(' > Ingrese el nombre del Robot que desea seleccionar: ')
+                robot = linked_robots.get_Robots_by_name(selection_robot)
+                if selection_robot is None:
+                    print(' > Nombre incorrecto')
+                else:
+                    print(' > Se ha seleccionado el robot: ', robot.getName_Robot())
+
+                #Mostrar Ubicacion de Puntos de entrada y Rercursos
+                print('\n')
+                print('> Puntos de Entrada: ')
+                while color != None:
+                    if color.getColor_Box() == Green:
+                        print(' > Punto de Entrada: (X:{},Y:{})'.format(color.getPosX_Box(),color.getPosY_Box()))
+                    color = color.getNext_Box()
+                print('\n')
+                print('> Ubicacion de Recursos: ')
+                while color1 != None:
+                    if color1.getColor_Box() == Gray:
+                        print(' > Ubicacion de Recurso: (X:{},Y:{})'.format(color1.getPosX_Box(),color1.getPosY_Box()))
+                    color1 = color1.getNext_Box()
+                print('\n')
+                entrada_x =  input('> Ingrese coordenada X del punto de Entrada: ')
+                entrada_y =  input('> Ingrese coordenada Y del punto de Entrada: ')
+
+                Entrada = codes.color_patterns.get_Boxs_By_Pos(int(entrada_x),int(entrada_y))
+                if Entrada.getColor_Box() != Green:
+                    print(' > Coordenadas De Entrada Incorrectas')               
+
+                print('\n')
+                recurso_x =  input('> Ingrese coordenada X del punto del Recurso: ')
+                recurso_y =  input('> Ingrese coordenada Y del punto del Recurso: ')
+
+                Recurso = codes.color_patterns.get_Boxs_By_Pos(int(recurso_x),int(recurso_y))
+                if Recurso.getColor_Box() != Gray:
+                    print(' > Coordenadas De Recurso Incorrectas') 
+                print('\n')
             else:
                 print(' > Opcion Invalida!')
-            
-            selection_robot =  input(' > Ingrese el nombre del Robot que desea seleccionar: ')
-            robot = linked_robots.get_Robots_by_name(selection_robot)
-
-            if selection_robot is None:
-                print(' > Nombre incorrecto')
-            else:
-                print(' > Se ha seleccionado el robot: ', robot.getName_Robot())
 
         elif option == '4':
-            Withe = '#FFFFFF'
-            Black = '#000000'
-            Green = '#008000'
-            Blue = '#0000FF'
-            Gray = '#808080'
-            Red = '#FF0000'
 
-            color: Box = codes.color_patterns.boxes_head
+            if type_of_mision == 'Mision de Rescate':
+                print('\n')
+                print('Mision Realizada!')
+                print('Ciudad Utilizada: {}'.format(city_name))
+                print('Tipo de mision: {}'.format(type_of_mision))
+                print('Robot Utilizado: {}, Capacidad de combate inicial: {}'.format(selection_robot,robot.getCapacity_Robot()))
+                print('Punto Entrada: (X:{},Y:{})'.format(Entrada.getPosX_Box(),Entrada.getPosY_Box()))
+                print('Civil Rescatado: (X:{},Y:{})'.format(Civil.getPosX_Box(),Civil.getPosY_Box()))
+                
+                """
+                color: Box =  codes.color_patterns.boxes_head
+                color1: Box =  codes.color_patterns.boxes_head
 
-            while color != None:
-                if color.getColor_Box() == Green:
-                    print(' > Puntos de Entrada: ')
-                    print('Coordenada X: ',color.getPosX_Box(),'Coordenada Y: ',color.getPosY_Box())
-                elif color.getColor_Box() == Blue:
-                    print(' > Coordenadas de civiles: ')
-                    print('Coordenada X: ',color.getPosX_Box(),'Coordenada Y: ',color.getPosY_Box())
+                
+                while color != None:
+                    if color.getColor_Box() == Black or color.getColor_Box() == Green \
+                        or color.getColor_Box() == Gray or color.getColor_Box() == Blue:
+                        color.blocked = True
+                    elif color.getColor_Box() == Withe:
+                        color.blocked = False
+                    color = color.getNext_Box()
+                
 
-        elif option == '5':
+                while color1 != None:
+                    if codes.color_patterns.get_Boxs_By_Pos(int(entrada_x)+1,int(entrada_y)) != codes.color_patterns.get_Boxs_By_Pos(int(entrada_x),int(entrada_y)):
+                        color1.setColor_Box(path)
+                    
+                    color1 = color1.getNext_Box()
+
+                codes.color_patterns.show_Boxes1(city_name)
+                """
+
+            elif type_of_mision == 'Mision de Extraccion':
+                print('\n')
+                print('Mision Realizada!')
+                print('Ciudad Utilizada: {}'.format(city_name))
+                print('Tipo de mision: {}'.format(type_of_mision))
+                print('Robot Utilizado: {}, Capacidad de combate inicial: {}'.format(selection_robot,robot.getCapacity_Robot()))
+                print('Punto Entrada: (X:{},Y:{})'.format(Entrada.getPosX_Box(),Entrada.getPosY_Box()))
+                print('Recurso Extraido: (X:{},Y:{})'.format(Recurso.getPosX_Box(),Recurso.getPosY_Box()))
 
             #Devolver al menu principal imediatamente despues de realizar la mision
             main_menu(linked_list,linked_robots)
+
             break
         else:
             print('Opcion Invalida!')
 
-
-
-
-
 def main_menu(linked_list: Linked_list_city,linked_robots: Linked_list_robot):
     flag = True
     while flag:
+        print('\n')
         print('=======================')
         print('Menu Principal')
         print('=======================')
@@ -687,10 +861,15 @@ def main_menu(linked_list: Linked_list_city,linked_robots: Linked_list_robot):
         option = input('> ')
 
         if option == '1':
+            #Tk().withdraw()
+            #filename = askopenfilename(initialdir="/",filetypes = [('Files','*.xml')])
+            #datas = open(filename, 'r+', encoding='utf-8')
+            #MiniDom(datas, linked_list,linked_robots)
             MiniDom('./Files/ArchivoPruebas.xml', linked_list,linked_robots)
-            print(' > La data se ha cargado!')
+            print('> La data se ha cargado!')
         elif option == '2':
-            print(' > Ciudades Cargadas: ')
+            print('\n')
+            print('> Ciudades Cargadas: ')
             linked_list.show_Citys()
         elif option == '3':
             second_menu(linked_list,linked_robots)
@@ -704,8 +883,7 @@ def main_menu(linked_list: Linked_list_city,linked_robots: Linked_list_robot):
             print(' > Opcion Invalida!')
 
 #----------------------------------------------------------------------------
-
-linked_city = Linked_list_city()
-linked_robots = Linked_list_robot()
 if __name__ == '__main__':
+    linked_city = Linked_list_city()
+    linked_robots = Linked_list_robot()
     main_menu(linked_city,linked_robots)
