@@ -1,6 +1,4 @@
-from glob import glob
-from importlib.resources import path
-from pyexpat.errors import codes
+from platform import node
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 from xml.dom import minidom
@@ -144,6 +142,9 @@ class Node_robot():
             
     def getCapacity_Robot(self):
         return self.robot_capacity
+    
+    def setCapacity_Robot(self, capacity):
+        self.robot_capacity = capacity
         
     def getNext_Robot(self):
         return self.next_robot
@@ -225,6 +226,9 @@ class Boxes_List():   #lista doblemente enlazada
             strGrafica += '{}[fillcolor= "{}" fontcolor = "{}" pos="{},-{}!"] \n'.format(tmp.get_Box(),tmp.getColor_Box(),tmp.getFont_Box(),tmp.getPosX_Box(),tmp.getPosY_Box())
             tmp = tmp.getNext_Box()
         
+        tmp2 = self.boxes_last
+        strGrafica += 'node2 [shape = "none", image="AuxFiles\\leyenda.png", label="" pos = "{},-{}!"] \n'.format(int(tmp2.getPosX_Box())/2,int(tmp2.getPosY_Box())+3)
+
         strGrafica += ' } '
         documentotxt = 'textoplano.txt'
         with open(documentotxt,'w') as grafica: 
@@ -236,7 +240,7 @@ class Boxes_List():   #lista doblemente enlazada
     def show_Boxes2(self,nombre_ciudad,civil, nombre_robot, resultado):
         tmp = self.boxes_head
 
-        strGrafica = 'digraph G { \n graph [pad="1" bgcolor="blue:cyan" style="filled" margin="0"  penwidth="3"] \n'
+        strGrafica = 'digraph G { \n graph [pad="1" bgcolor="yellow:orange" style="filled" margin="0"  penwidth="3"] \n'
         strGrafica += 'label = "\n \n Ciudad: {}, \n Tipo de mision: Rescate, \n Unidad Civil Rescatada: ({},{}) \n Robot Utilizado: {}, \n Resultado de la mision: {}" \
                         fontname="times-bold" fontsize="20pt" '.format(nombre_ciudad,civil.getPosX_Box(),civil.getPosY_Box(),nombre_robot,resultado)
 
@@ -245,6 +249,10 @@ class Boxes_List():   #lista doblemente enlazada
         while tmp != None:
             strGrafica += '{}[fillcolor= "{}" fontcolor = "{}" pos="{},-{}!"] \n'.format(tmp.get_Box(),tmp.getColor_Box(),tmp.getFont_Box(),tmp.getPosX_Box(),tmp.getPosY_Box())
             tmp = tmp.getNext_Box()
+        
+        tmp2 = self.boxes_last
+        strGrafica += 'node2 [shape = "none", image="AuxFiles\\leyenda.png", label="" pos = "{},-{}!"] \n'.format(int(tmp2.getPosX_Box())/2,int(tmp2.getPosY_Box())+3)
+
         
         strGrafica += ' } '
         documentotxt = 'textoplano.txt'
@@ -257,7 +265,7 @@ class Boxes_List():   #lista doblemente enlazada
     def show_Boxes3(self, nombre_ciudad, recurso, nombre_robot, capacidad_inicial, capacidad_final, resultado):
         tmp = self.boxes_head
 
-        strGrafica = 'digraph G { \n graph [pad="1" bgcolor="red:violet" style="filled" margin="0"  penwidth="3"] \n'
+        strGrafica = 'digraph G { \n graph [pad="1" bgcolor="yellow:orange" style="filled" margin="0"  penwidth="3"] \n'
         strGrafica += ' label = "\n \n Ciudad: {} \n Tipo de mision: Extraccion de Recursos \n Recurso Extraido: ({},{}) \n Robot Utilizado: {} \n (Capacidad Inicial: {}, Capacidad Final: {}) \n Resultado de la mision: {}" \
                         fontname="times-bold" fontsize="20pt" '.format(nombre_ciudad,recurso.getPosX_Box(),recurso.getPosY_Box(),nombre_robot,capacidad_inicial,capacidad_final,resultado)
 
@@ -267,6 +275,10 @@ class Boxes_List():   #lista doblemente enlazada
             strGrafica += '{}[fillcolor= "{}" fontcolor = "{}" pos="{},-{}!"] \n'.format(tmp.get_Box(),tmp.getColor_Box(),tmp.getFont_Box(),tmp.getPosX_Box(),tmp.getPosY_Box())
             tmp = tmp.getNext_Box()
         
+        tmp2 = self.boxes_last
+        strGrafica += 'node2 [shape = "none", image="AuxFiles\\leyenda.png", label="" pos = "{},-{}!"] \n'.format(int(tmp2.getPosX_Box())/2,int(tmp2.getPosY_Box())+3)
+
+
         strGrafica += ' } '
         documentotxt = 'textoplano.txt'
         with open(documentotxt,'w') as grafica: 
@@ -511,7 +523,8 @@ codes = ''
 citys = ''
 Civil = ''
 Recurso = ''
-Entrada = ''
+
+robot = ''
 
 #Colores
 Withe = '#FFFFFF'
@@ -631,11 +644,6 @@ def MiniDom(datas, linked_list: Linked_list_city, linked_robots: Linked_list_rob
     #linked_robots.show_Robots()
 #---------------------------------------------------------------------------- 
 
-def get_distace(x1,x2,y1,y2):
-    distance =  (((x1-x2)**2)**(0.5)) + (((y1-y2)**2)**(0.5))
-    return distance
-
-
 def second_menu(linked_list,linked_robots: Linked_list_robot):
 
     flag = True
@@ -663,7 +671,8 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
         global codes
         global Civil
         global Recurso
-        global Entrada
+
+        global robot
 
         global Withe
         global Black
@@ -673,14 +682,18 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
         global Red
         global Path
         
+        
         mision_type = ''
 
         if option == '1':
             print()
             try:
                 city_name =  input(' > Ingrese el nombre de la ciudad que desea seleccionar: ')
+                #citys: Node_city = linked_list.get_Citys(city_name)
                 citys = linked_list.get_Citys(city_name)
                 
+                
+
                 if citys is None:
                     print(' > Nombre incorrecto')
                 else:
@@ -803,6 +816,9 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
                     print()
                     selection_robot =  input(' > Ingrese el nombre del Robot que desea seleccionar: ')
                     robot = linked_robots.get_Robots_by_name(selection_robot)
+                    
+                    
+
                     if robot is None:
                         print(' > Nombre incorrecto')
                     else:
@@ -861,11 +877,48 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
                 coin_x = int(Coin.getPosX_Box())
                 coin_y = int(Coin.getPosY_Box())
 
-                if find_path(coin_x,coin_y) == True:
+                if find_path_Rescue(coin_x,coin_y) == True:
                     mision_result = 'Mision Exitosa'
+
+                    color: Box =  codes.color_patterns.boxes_head
+                    while color != None:
+                        if color.getFont_Box() == Blue:
+                            color.setColor_Box(Blue)
+                        if color.getFont_Box() == Red:
+                            color.setColor_Box(Red)
+                        if color.getFont_Box() == Green:
+                            color.setColor_Box(Green)
+                        if color.getFont_Box() == Gray:
+                            color.setColor_Box(Gray)
+
+                        if color.getColor_Box() == Path:
+                            color.setFont_Box(Path)                   
+        
+                        color = color.getNext_Box()
+
                     codes.color_patterns.show_Boxes2(city_name,Civil,selection_robot,mision_result)
+
                 else:
-                    print('mision fallida :c')
+                    print(' > Ha fracasado la mision :[ ')
+                    mision_result = 'Mision Fallida'
+
+                    color: Box =  codes.color_patterns.boxes_head
+                    while color != None:
+                        if color.getFont_Box() == Blue:
+                            color.setColor_Box(Blue)
+                        if color.getFont_Box() == Red:
+                            color.setColor_Box(Red)
+                        if color.getFont_Box() == Green:
+                            color.setColor_Box(Green)
+                        if color.getFont_Box() == Gray:
+                            color.setColor_Box(Gray)
+
+                        if color.getColor_Box() == Path:
+                            color.setFont_Box(Path)                   
+        
+                        color = color.getNext_Box()
+
+                    codes.color_patterns.show_Boxes2(city_name,Civil,selection_robot,mision_result)
 
 
             elif type_of_mision == 'Mision de Extraccion':
@@ -883,9 +936,53 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
                 print('Punto Entrada: (X:{},Y:{})'.format(Entrada.getPosX_Box(),Entrada.getPosY_Box()))
                 print('Recurso Extraido: (X:{},Y:{})'.format(Recurso.getPosX_Box(),Recurso.getPosY_Box()))
             
+                Coin = codes.color_patterns.get_Boxs_By_Pos(Entrada.getPosX_Box(),Entrada.getPosY_Box())
 
-                codes.color_patterns.show_Boxes3(city_name,Recurso,selection_robot,capacidad_incial,capacidad_final,mision_result)
+                coin_x = int(Coin.getPosX_Box())
+                coin_y = int(Coin.getPosY_Box())
 
+                if find_path_Extract(coin_x,coin_y) == True:
+                    mision_result = 'Mision Exitosa'
+
+                    color: Box =  codes.color_patterns.boxes_head
+                    while color != None:
+                        if color.getFont_Box() == Blue:
+                            color.setColor_Box(Blue)
+                        if color.getFont_Box() == Red:
+                            color.setColor_Box(Red)
+                        if color.getFont_Box() == Green:
+                            color.setColor_Box(Green)
+                        if color.getFont_Box() == Gray:
+                            color.setColor_Box(Gray)
+
+                        if color.getColor_Box() == Path:
+                            color.setFont_Box(Path)                   
+        
+                        color = color.getNext_Box()
+
+                    codes.color_patterns.show_Boxes3(city_name,Recurso,selection_robot,capacidad_incial,capacidad_final,mision_result)
+
+                else:
+                    print(' > Ha fracasado la mision :[ ')
+                    mision_result = 'Mision Fallida'
+
+                    color: Box =  codes.color_patterns.boxes_head
+                    while color != None:
+                        if color.getFont_Box() == Blue:
+                            color.setColor_Box(Blue)
+                        if color.getFont_Box() == Red:
+                            color.setColor_Box(Red)
+                        if color.getFont_Box() == Green:
+                            color.setColor_Box(Green)
+                        if color.getFont_Box() == Gray:
+                            color.setColor_Box(Gray)
+
+                        if color.getColor_Box() == Path:
+                            color.setFont_Box(Path)                   
+        
+                        color = color.getNext_Box()
+
+                    codes.color_patterns.show_Boxes3(city_name,Recurso,selection_robot,capacidad_incial,capacidad_final,mision_result)
             #Devolver al menu principal imediatamente despues de realizar la mision
             #Devolver los colores estandar a las ciudades
             main_menu(linked_list,linked_robots)
@@ -894,7 +991,8 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
         else:
             print('Opcion Invalida!')
 
-def find_path(x,y):
+def find_path_Rescue(x,y):
+
     global citys
     global codes
     global Civil
@@ -903,25 +1001,100 @@ def find_path(x,y):
     global Black
     global Withe
     global Path
-    global Blue
+    global Gray 
+    global Red
+    global Green
 
-    nodo: Box = codes.color_patterns.get_Boxs_By_Pos(int(x),int(y))
-   
-    if  x >= len(citys.getColumn_City()) or y >= len(citys.getRow_City()) or x < 0 or y < 0 or nodo.getColor_Box() == Black or nodo.getColor_Box() == Path:
+    try:
+        nodo: Box = codes.color_patterns.get_Boxs_By_Pos(int(x),int(y))
+
+        if x < 0 or y < 0 or nodo.getColor_Box() == Black \
+            or nodo.getColor_Box() == Path or nodo.getColor_Box() == Gray or nodo.getColor_Box() == Red:
+            return False
+
+        if (nodo.getPosX_Box() == Civil.getPosX_Box()) and (nodo.getPosY_Box() == Civil.getPosY_Box()):
+            return True
+
+        nodo.setColor_Box(Path)
+
+        if find_path_Rescue(x,y+1) or find_path_Rescue(x,y-1) or find_path_Rescue(x+1,y) or find_path_Rescue(x-1,y):
+            return True
+        
+        nodo.setColor_Box(Withe)
+
+        # if find_path_Rescue(x,y) == False:
+        #     nodo.setColor_Box(Path)
+
         return False
 
-    if nodo.getColor_Box() == Blue:
-        return True
+    except:
+        print('Cambiando Ruta')
+
+
+def find_path_Extract(x,y):
+
+    global citys
+    global codes
+    global Civil
+    global Recurso
+    global capacidad_final
+
+    global robot
+
+    global Black
+    global Withe
+    global Path
+    global Gray 
+    global Red
+    global Green
+
+    militarys = ''
+
+    try:
+        nodo: Box = codes.color_patterns.get_Boxs_By_Pos(int(x),int(y))
+
+        if x < 0 or y < 0 or nodo.getColor_Box() == Black \
+            or nodo.getColor_Box() == Path or nodo.getColor_Box() == Blue:
+            return False
+
+        if (nodo.getPosX_Box() == Recurso.getPosX_Box()) and (nodo.getPosY_Box() == Recurso.getPosY_Box()):
+            return True
+  
+        nodo.setColor_Box(Path)
+
+        if find_path_Extract(x,y+1) or find_path_Extract(x,y-1) or find_path_Extract(x+1,y) or find_path_Extract(x-1,y):
+            return True
+        
+        if nodo.getFont_Box() == Red:
+            military_x = int(nodo.getPosX_Box())  
+            military_y = int(nodo.getPosY_Box()) 
+            militarys: Node_military = citys.military_units.get_Militarys(military_x,military_y)  
+            print('militar: ',militarys.getCapacity_Military())
+        
+            if (nodo.getPosX_Box() == militarys.getPos_X()) and (nodo.getPosY_Box() == militarys.getPos_Y()):
+                if robot.getCapacity_Robot() > militarys.getCapacity_Military():
+                    print('robot: ',robot.getCapacity_Robot())
+                    new_capacity = int(robot.getCapacity_Robot())-int(militarys.getCapacity_Military())
+                    capacidad_final = new_capacity
+                    robot.setCapacity_Robot(new_capacity)
+                    print('robot N: ',new_capacity)
+                    print(new_capacity)
+                elif robot.getCapacity_Robot() < militarys.getCapacity_Military():
+                    capacidad_final = None
+                    robot.setCapacity_Robot(capacidad_final)
+                    print('robot f: ',capacidad_final)
+                    return False
+
+        nodo.setColor_Box(Withe)
     
-    nodo.setColor_Box(Path)
+        # if find_path_Extract(x,y) == False:
+        #     nodo.setColor_Box(Path)
 
-    if find_path(x,y+1) or find_path(x,y-1) or find_path(x+1,y) or find_path(x-1,y):
-        return True
+        return False
+
+    except:
+        print('Cambiando Ruta')
     
-    nodo.setColor_Box(Withe)
-
-    return False
-
 
 def main_menu(linked_list: Linked_list_city,linked_robots: Linked_list_robot):
     flag = True
