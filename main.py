@@ -6,6 +6,36 @@ from xml.dom import minidom
 import os 
 import webbrowser
 
+
+#GLOBALES
+
+#Auxiliares
+city_name = ''
+type_of_mision = ''
+selection_robot = ''
+mision_result = ''
+
+capacidad_incial = ''
+capacidad_final = ''
+
+codes = ''
+citys = ''
+Civil = ''
+Recurso = ''
+
+robot = ''
+
+#Colores
+Withe = '#FFFFFF'
+Black = '#000000'
+Green = '#00FF00'
+Blue = '#0066FF'
+Gray = '#AEB6BF'
+Red = '#C62828'
+Path = 'Cyan'
+
+
+
 #----------------------------------------------------------------------------
 class Linked_list_military():
     def __init__(self) -> None:
@@ -212,12 +242,6 @@ class Boxes_List():   #lista doblemente enlazada
     def show_Boxes1(self, name):
         tmp = self.boxes_head
 
-        #bgcolor="red:purple"
-        #bgcolor="purple:pink"
-        #bgcolor="red:violet"
-        #fillcolor="blue:cyan"
-        #fillcolor="red:yellow"
-
         strGrafica = 'digraph G { \n graph [pad="1" bgcolor="yellow:orange" style="filled" margin="0"  penwidth="3"] \n'
         strGrafica += 'label = "\n \n Ciudad: {}" fontname="times-bold" fontsize="20pt" \n'.format(name)
         strGrafica += 'node [style = filled shape = box height="1" width="1"] \n'
@@ -241,8 +265,8 @@ class Boxes_List():   #lista doblemente enlazada
         tmp = self.boxes_head
 
         strGrafica = 'digraph G { \n graph [pad="1" bgcolor="yellow:orange" style="filled" margin="0"  penwidth="3"] \n'
-        strGrafica += 'label = "\n \n Ciudad: {}, \n Tipo de mision: Rescate, \n Unidad Civil Rescatada: ({},{}) \n Robot Utilizado: {}, \n Resultado de la mision: {}" \
-                        fontname="times-bold" fontsize="20pt" '.format(nombre_ciudad,civil.getPosX_Box(),civil.getPosY_Box(),nombre_robot,resultado)
+        strGrafica += 'label = "\n \n Resultado de la mision: {}! \n \n Ciudad: {} \n Tipo de mision: Rescate \n Unidad Civil Rescatada: ({},{}) \n Robot Utilizado: {}" \
+            fontname="times-bold" fontsize="20pt" '.format(resultado,nombre_ciudad,civil.getPosX_Box(),civil.getPosY_Box(),nombre_robot)
 
         strGrafica += 'node [style = filled shape = box height="1" width="1"] \n'
 
@@ -266,8 +290,8 @@ class Boxes_List():   #lista doblemente enlazada
         tmp = self.boxes_head
 
         strGrafica = 'digraph G { \n graph [pad="1" bgcolor="yellow:orange" style="filled" margin="0"  penwidth="3"] \n'
-        strGrafica += ' label = "\n \n Ciudad: {} \n Tipo de mision: Extraccion de Recursos \n Recurso Extraido: ({},{}) \n Robot Utilizado: {} \n (Capacidad Inicial: {}, Capacidad Final: {}) \n Resultado de la mision: {}" \
-                        fontname="times-bold" fontsize="20pt" '.format(nombre_ciudad,recurso.getPosX_Box(),recurso.getPosY_Box(),nombre_robot,capacidad_inicial,capacidad_final,resultado)
+        strGrafica += ' label = "\n \n Resultado de la mision: {}! \n \n Ciudad: {} \n Tipo de mision: Extraccion de Recursos \n Recurso Extraido: ({},{}) \n Robot Utilizado: {} \n (Capacidad Inicial: {}, Capacidad Final: {})" \
+                        fontname="times-bold" fontsize="20pt" '.format(resultado,nombre_ciudad,recurso.getPosX_Box(),recurso.getPosY_Box(),nombre_robot,capacidad_inicial,capacidad_final)
 
         strGrafica += 'node [style = filled shape = box height="1" width="1"] \n'
 
@@ -508,33 +532,6 @@ class Node_city():
         self.next_city = city
 #----------------------------------------------------------------------------
 
-#GLOBALS
-
-#Auxiliares
-city_name = ''
-type_of_mision = ''
-selection_robot = ''
-mision_result = ''
-
-capacidad_incial = ''
-capacidad_final = ''
-
-codes = ''
-citys = ''
-Civil = ''
-Recurso = ''
-
-robot = ''
-
-#Colores
-Withe = '#FFFFFF'
-Black = '#000000'
-Green = '#00FF00'
-Blue = '#0066FF'
-Gray = '#AEB6BF'
-Red = '#C62828'
-Path = 'Cyan'
-
 #----------------------------------------------------------------------------
 def MiniDom(datas, linked_list: Linked_list_city, linked_robots: Linked_list_robot):
 
@@ -550,7 +547,6 @@ def MiniDom(datas, linked_list: Linked_list_city, linked_robots: Linked_list_rob
     linked_robots.clear()
 
     mydoc = minidom.parse(datas)
-
     #Extraer Ciudades
     citys = mydoc.getElementsByTagName('ciudad')
     for city in citys:
@@ -644,6 +640,7 @@ def MiniDom(datas, linked_list: Linked_list_city, linked_robots: Linked_list_rob
     #linked_robots.show_Robots()
 #---------------------------------------------------------------------------- 
 
+#---------------------------------------------------------------------------- 
 def second_menu(linked_list,linked_robots: Linked_list_robot):
 
     flag = True
@@ -990,7 +987,9 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
             break
         else:
             print('Opcion Invalida!')
-
+#---------------------------------------------------------------------------- 
+ 
+#---------------------------------------------------------------------------- 
 def find_path_Rescue(x,y):
 
     global citys
@@ -1029,7 +1028,8 @@ def find_path_Rescue(x,y):
 
     except:
         print('Cambiando Ruta')
-
+#---------------------------------------------------------------------------- 
+#---------------------------------------------------------------------------- 
 
 def find_path_Extract(x,y):
 
@@ -1048,8 +1048,6 @@ def find_path_Extract(x,y):
     global Red
     global Green
 
-    militarys = ''
-
     try:
         nodo: Box = codes.color_patterns.get_Boxs_By_Pos(int(x),int(y))
 
@@ -1064,26 +1062,6 @@ def find_path_Extract(x,y):
 
         if find_path_Extract(x,y+1) or find_path_Extract(x,y-1) or find_path_Extract(x+1,y) or find_path_Extract(x-1,y):
             return True
-        
-        if nodo.getFont_Box() == Red:
-            military_x = int(nodo.getPosX_Box())  
-            military_y = int(nodo.getPosY_Box()) 
-            militarys: Node_military = citys.military_units.get_Militarys(military_x,military_y)  
-            print('militar: ',militarys.getCapacity_Military())
-        
-            if (nodo.getPosX_Box() == militarys.getPos_X()) and (nodo.getPosY_Box() == militarys.getPos_Y()):
-                if robot.getCapacity_Robot() > militarys.getCapacity_Military():
-                    print('robot: ',robot.getCapacity_Robot())
-                    new_capacity = int(robot.getCapacity_Robot())-int(militarys.getCapacity_Military())
-                    capacidad_final = new_capacity
-                    robot.setCapacity_Robot(new_capacity)
-                    print('robot N: ',new_capacity)
-                    print(new_capacity)
-                elif robot.getCapacity_Robot() < militarys.getCapacity_Military():
-                    capacidad_final = None
-                    robot.setCapacity_Robot(capacidad_final)
-                    print('robot f: ',capacidad_final)
-                    return False
 
         nodo.setColor_Box(Withe)
     
@@ -1094,8 +1072,9 @@ def find_path_Extract(x,y):
 
     except:
         print('Cambiando Ruta')
-    
-
+#---------------------------------------------------------------------------- 
+#---------------------------------------------------------------------------- 
+  
 def main_menu(linked_list: Linked_list_city,linked_robots: Linked_list_robot):
     flag = True
     while flag:
@@ -1112,11 +1091,11 @@ def main_menu(linked_list: Linked_list_city,linked_robots: Linked_list_robot):
         option = input('> ')
 
         if option == '1':
-            # Tk().withdraw()
-            # filename = askopenfilename(initialdir="./",filetypes = [('Files','*.xml')])
-            # datas = open(filename, 'r+', encoding='utf-8')
-            # MiniDom(datas, linked_list,linked_robots)
-            MiniDom('./Files/ArchivoPruebas.xml', linked_list,linked_robots)
+            Tk().withdraw()
+            filename = askopenfilename(initialdir="./",filetypes = [('Files','*.xml')])
+            datas = open(filename, 'r+', encoding='utf-8')
+            MiniDom(datas, linked_list,linked_robots)
+            #MiniDom('./Files/ArchivoPruebas.xml', linked_list,linked_robots)
             print('> La data se ha cargado!')
         elif option == '2':
             print()
@@ -1132,6 +1111,7 @@ def main_menu(linked_list: Linked_list_city,linked_robots: Linked_list_robot):
             print('=======================')
         else:
             print(' > Opcion Invalida!')
+#---------------------------------------------------------------------------- 
 
 #----------------------------------------------------------------------------
 if __name__ == '__main__':
