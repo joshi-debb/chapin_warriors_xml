@@ -19,7 +19,8 @@ capacidad_incial = ''
 capacidad_final = ''
 
 codes = ''
-citys = ''
+
+
 Civil = ''
 Recurso = ''
 
@@ -190,6 +191,9 @@ class Boxes_List():   #lista doblemente enlazada
         self.boxes_last = None #final
         self.boxes_size = 0
 
+        self.boxes_civil = 0
+        self.boxes_resource = 0
+
     def add_to_end(self,box,box_posX,box_posY,box_color,font_color):
         new_boxes = Box(box,box_posX,box_posY,box_color,font_color)
         self.boxes_size += 1
@@ -248,6 +252,10 @@ class Boxes_List():   #lista doblemente enlazada
 
         while tmp != None:
             strGrafica += '{}[fillcolor= "{}" fontcolor = "{}" pos="{},-{}!"] \n'.format(tmp.get_Box(),tmp.getColor_Box(),tmp.getFont_Box(),tmp.getPosX_Box(),tmp.getPosY_Box())
+            if tmp.getColor_Box() == Blue:
+                self.boxes_civil += 1
+            if tmp.getColor_Box() == Gray:
+                self.boxes_resource += 1
             tmp = tmp.getNext_Box()
         
         tmp2 = self.boxes_last
@@ -664,7 +672,9 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
         global capacidad_incial
         global capacidad_final
 
-        global citys
+        global civil_counter
+        global resource_counter
+
         global codes
         global Civil
         global Recurso
@@ -687,9 +697,7 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
             try:
                 city_name =  input(' > Ingrese el nombre de la ciudad que desea seleccionar: ')
                 #citys: Node_city = linked_list.get_Citys(city_name)
-                citys = linked_list.get_Citys(city_name)
-                
-                
+                citys: Node_city = linked_list.get_Citys(city_name)
 
                 if citys is None:
                     print(' > Nombre incorrecto')
@@ -701,6 +709,8 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
             try:
                 codes = citys.code_patterns.get_Patterns(citys.getName_City())
                 codes.color_patterns.show_Boxes1(citys.getName_City())
+
+                
 
                 color: Box =  codes.color_patterns.boxes_head
 
@@ -745,7 +755,15 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
                     type_of_mision = 'Mision de Rescate'
 
                     color =  codes.color_patterns.boxes_head
-                    color1 =  codes.color_patterns.boxes_head 
+                    color1 =  codes.color_patterns.boxes_head
+
+                    civiles: Node_city =  codes.color_patterns.boxes_civil
+
+                    if civiles == 0:
+                        print(' > Mision imposible: NO EXISTEN UNIDADES CIVILES')
+                        break
+                    else:
+                        pass
 
                     #Mision de Rescate
                     print()
@@ -802,7 +820,15 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
                     type_of_mision = 'Mision de Extraccion'
 
                     color =  codes.color_patterns.boxes_head
-                    color1 =  codes.color_patterns.boxes_head   
+                    color1 =  codes.color_patterns.boxes_head
+
+                    recursos: Node_city =  codes.color_patterns.boxes_resource
+
+                    if recursos == 0:
+                        print(' > Mision imposible: NO HAY RECURSOS EXISTENTES')
+                        break
+                    else:
+                        pass
 
                     #Mision de Extraccion
                     print()
@@ -919,8 +945,6 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
 
 
             elif type_of_mision == 'Mision de Extraccion':
-
-                mision_result = 'Mision Exitosa'
                 
                 capacidad_incial = robot.getCapacity_Robot()
                 capacidad_final = None
@@ -938,9 +962,11 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
                 coin_x = int(Coin.getPosX_Box())
                 coin_y = int(Coin.getPosY_Box())
 
+
                 if find_path_Extract(coin_x,coin_y) == True:
                     mision_result = 'Mision Exitosa'
 
+                    #correccion de colores
                     color: Box =  codes.color_patterns.boxes_head
                     while color != None:
                         if color.getFont_Box() == Blue:
@@ -992,11 +1018,8 @@ def second_menu(linked_list,linked_robots: Linked_list_robot):
 #---------------------------------------------------------------------------- 
 def find_path_Rescue(x,y):
 
-    global citys
     global codes
     global Civil
-    global Recurso
-
     global Black
     global Withe
     global Path
@@ -1021,9 +1044,6 @@ def find_path_Rescue(x,y):
         
         nodo.setColor_Box(Withe)
 
-        # if find_path_Rescue(x,y) == False:
-        #     nodo.setColor_Box(Path)
-
         return False
 
     except:
@@ -1033,14 +1053,8 @@ def find_path_Rescue(x,y):
 
 def find_path_Extract(x,y):
 
-    global citys
     global codes
-    global Civil
     global Recurso
-    global capacidad_final
-
-    global robot
-
     global Black
     global Withe
     global Path
@@ -1064,9 +1078,6 @@ def find_path_Extract(x,y):
             return True
 
         nodo.setColor_Box(Withe)
-    
-        # if find_path_Extract(x,y) == False:
-        #     nodo.setColor_Box(Path)
 
         return False
 
